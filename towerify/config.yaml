@@ -1,0 +1,5 @@
+name: adg-buvette
+type: static
+config:
+  dockerfile: ./towerify/Dockerfile
+  stackfile: ./towerify/stack.yaml

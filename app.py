@@ -7,17 +7,30 @@ from flask import Flask, g, render_template, request, Response
 from functools import wraps
 from io import StringIO
 
-DB = os.getenv("TILL_DB", "till.db")
+# charge .env si présent (utile en dev)
+from dotenv import load_dotenv
+load_dotenv()
+
+# Config via env
+DB = os.getenv("TILL_DB", "/data/till.db")
 ADMIN_USER = os.getenv("ADMIN_USER", "buvette")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "secret")
+FLASK_SECRET = os.getenv("FLASK_SECRET", "change_this_secret")
 
 app = Flask(__name__)
-app.secret_key = os.getenv("FLASK_SECRET", "change_this_secret")
+app.secret_key = FLASK_SECRET
 
 def get_db():
     db = getattr(g, "_db", None)
     if db is None:
-        db = g._db = sqlite3.connect(DB)
+        # create parent dir if missing
+        parent = os.path.dirname(DB)
+        if parent and not os.path.exists(parent):
+            try:
+                os.makedirs(parent, exist_ok=True)
+            except OSError:
+                pass
+        db = g._db = sqlite3.connect(DB, check_same_thread=False)
         db.row_factory = sqlite3.Row
     return db
 
@@ -44,7 +57,10 @@ def order():
     items = data.get("items", [])
     if not items:
         return {"error": "Empty order"}, 400
-    total = sum(float(it.get("price", 0)) * int(it.get("qty", 0)) for it in items)
+    try:
+        total = sum(float(it.get("price", 0)) * int(it.get("qty", 0)) for it in items)
+    except Exception:
+        return {"error": "Invalid items data"}, 400
     created_at = datetime.utcnow().isoformat()
     db = get_db()
     c = db.cursor()
@@ -68,7 +84,6 @@ def authenticate():
 def requires_auth(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        from flask import request
         auth = request.authorization
         if not auth or not check_auth(auth.username, auth.password):
             return authenticate()
@@ -123,8 +138,25 @@ def admin_export():
         headers={"Content-Disposition": "attachment;filename=orders.csv"}
     )
 
+# initialise DB si besoin (utile pour la 1re exécution en container)
+def init_db():
+    schema = """
+    CREATE TABLE IF NOT EXISTS orders (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        items_json TEXT NOT NULL,
+        total REAL NOT NULL,
+        created_at TEXT NOT NULL
+    );
+    """
+    conn = sqlite3.connect(DB)
+    c = conn.cursor()
+    c.executescript(schema)
+    conn.commit()
+    conn.close()
+
+# Initialise la DB au démarrage
+init_db()
+
 if __name__ == "__main__":
-    if not os.path.exists(DB):
-        import init_db
-        init_db.init()
-    app.run(host="0.0.0.0", port=7828, debug=True)
+    # seulement utile en dev local
+    app.run(host="0.0.0.0", port=7828, debug=False)

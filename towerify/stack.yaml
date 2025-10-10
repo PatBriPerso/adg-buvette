@@ -1,0 +1,21 @@
+services:
+  app:
+    image: __DOCKER_IMAGE_NAME__:__DOCKER_IMAGE_TAG__
+    ports:
+      - target: 7828
+        published: __PORT__
+    extra_hosts:
+      host.docker.internal: host-gateway
+    env_file:
+      - .env
+    environment:
+      # si TILL_DB est défini dans .env, il sera utilisé, sinon on monte /data/till.db
+      - TILL_DB=/data/till.db
+      - FLASK_ENV=production
+    volumes:
+      - ./data:/data    # persiste till.db ici
+    deploy:
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
