@@ -37,16 +37,27 @@
       }
       return false;
   }
+
+  document.addEventListener("DOMContentLoaded", function () {
+      const elements = document.querySelectorAll(".utc-date");
+      elements.forEach(el => {
+          const utcString = el.textContent.trim();
+          const date = new Date(utcString + "Z"); // force en UTC
+          if (!isNaN(date)) {
+              el.textContent = date.toLocaleString(); // convertir dans le fuseau local
+          }
+      });
+  });
   </script>
 
   <h5 class="mt-3">Historique des commandes</h5>
   <table class="table">
-    <thead><tr><th>#</th><th>Time (UTC)</th><th>Items</th><th>Total</th></tr></thead>
+    <thead><tr><th>#</th><th>Date et heure</th><th>Produits</th><th>Total</th></tr></thead>
     <tbody>
       {% for o in orders %}
       <tr>
         <td>{{o.id}}</td>
-        <td>{{o.created_at}}</td>
+        <td><span class="utc-date">{{o.created_at}}</span></td>
         <td>
           <ul>
           {% for it in o["items"] %}
