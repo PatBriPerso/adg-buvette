@@ -167,4 +167,4 @@ init_db()
 
 if __name__ == "__main__":
     # seulement utile en dev local
-    app.run(host="0.0.0.0", port=7828, debug=False)
+    app.run(host="0.0.0.0", port=7828, debug=True)
