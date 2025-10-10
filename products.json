@@ -1,0 +1,22 @@
+[
+  {"id": "jambon-beurre", "name": "Jambon Beurre", "price": 3.00},
+  {"id": "jambon-gruyere", "name": "Jambon Gruyère", "price": 3.50},
+  {"id": "rosette", "name": "Rosette", "price": 3.00},
+  {"id": "crudite-thon", "name": "Crudités Thon", "price": 3.50},
+  {"id": "croque-monsieur", "name": "Croque-Monsieur", "price": 3.50},
+
+  {"id": "gaufre", "name": "Gaufre", "price": 2.00},
+  {"id": "patisseries", "name": "Patisseries", "price": 1.50},
+  {"id": "clementines-3", "name": "Les 2 clémentines", "price": 1.00},
+  {"id": "barre", "name": "Barres diverses (pièce)", "price": 0.50},
+
+  {"id": "coca", "name": "Coca Cola", "price": 1.00},
+  {"id": "orangina", "name": "Orangina", "price": 1.00},
+  {"id": "ice-tea", "name": "Ice Tea", "price": 1.00},
+  {"id": "eau", "name": "Eau 50cl", "price": 0.50},
+  {"id": "cafe", "name": "Café", "price": 0.50},
+  {"id": "the", "name": "Thé", "price": 0.50},
+  {"id": "chocolat-chaud", "name": "Chocolat chaud", "price": 1.00},
+
+  {"id": "consigne-gobelet", "name": "Consigne du gobelet", "price": 1.00}
+]
