@@ -9,12 +9,13 @@ function renderCart(){
   } else {
     cart.forEach((it, idx) => {
       const li = document.createElement("li");
-      li.className = "list-group-item d-flex justify-content-between align-items-center";
-      li.innerHTML = `<div>${it.name} x${it.qty} <small>${(it.price*it.qty).toFixed(2)}€</small></div>
-                      <div>
-                        <button class="btn btn-sm btn-outline-secondary me-1" onclick="dec(${idx})">-</button>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="inc(${idx})">+</button>
-                      </div>`;
+      li.className = "list-group-item d-flex justify-content-between align-items-baseline p-1";
+      li.innerHTML = `
+                      <div class="fs-4 me-auto"><b>${it.qty}x</b> ${it.name}</div>
+                      <div class="m-2">${(it.price*it.qty).toFixed(2)}€</div>
+                      <div><button class="btn btn-sm btn-outline-secondary me-1" onclick="dec(${idx})">-</button></div>
+                      <div><button class="btn btn-sm btn-outline-secondary" onclick="inc(${idx})">+</button></div>
+                      `;
       cartEl.appendChild(li);
       total += it.price * it.qty;
     });
