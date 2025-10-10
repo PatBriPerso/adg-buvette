@@ -1,0 +1,140 @@
+{
+  "options": [
+    {
+      "id": "product_variant",
+      "label": "Produit",
+      "type": "select",
+      "values": ["Standard", "Deluxe", "Pro"],
+      "default": "Standard"
+    },
+    {
+      "id": "color",
+      "label": "Couleur",
+      "type": "select",
+      "values": ["Blanc", "Noir", "Rouge"],
+      "default": "Blanc"
+    },
+    {
+      "id": "size",
+      "label": "Taille",
+      "type": "select",
+      "values": ["S", "M", "L"],
+      "default": "M"
+    },
+    {
+      "id": "gift_pack",
+      "label": "Emballage cadeau",
+      "type": "checkbox",
+      "default": false
+    },
+    {
+      "id": "engraving",
+      "label": "Gravure personnalisée",
+      "type": "checkbox",
+      "default": false
+    },
+    {
+      "id": "engraving_text",
+      "label": "Texte de gravure",
+      "type": "text",
+      "placeholder": "Texte (max 30 chars)",
+      "visibleWhen": [
+        { "option": "engraving", "value": true }
+      ]
+    },
+    {
+      "id": "warranty",
+      "label": "Garantie étendue",
+      "type": "select",
+      "values": ["Aucune", "1 an", "2 ans"],
+      "default": "Aucune",
+      "visibleWhen": [
+        { "option": "product_variant", "value": "Deluxe" },
+        { "option": "product_variant", "value": "Pro" }
+      ]
+    }
+  ],
+
+  "articles": [
+    { "id": "base_standard", "label": "Produit Standard", "price": 30 },
+    { "id": "base_deluxe", "label": "Produit Deluxe", "price": 55 },
+    { "id": "base_pro", "label": "Produit Pro", "price": 90 },
+
+    { "id": "color_premium", "label": "Couleur premium (Rouge)", "price": 4 },
+    { "id": "size_l", "label": "Taille L (+) ", "price": 6 },
+
+    { "id": "gift_pack", "label": "Emballage cadeau", "price": 3 },
+    { "id": "engraving", "label": "Gravure (forfait)", "price": 10 },
+    { "id": "warranty_1", "label": "Garantie 1 an", "price": 12 },
+    { "id": "warranty_2", "label": "Garantie 2 ans", "price": 20 }
+  ],
+
+  "rules": [
+    {
+      "id": "base_by_variant",
+      "conditions": [],
+      "strategy": "base",
+      "add": {
+        "Standard": ["base_standard"],
+        "Deluxe": ["base_deluxe"],
+        "Pro": ["base_pro"]
+      }
+    },
+
+    {
+      "id": "color_premium_rule",
+      "conditions": [
+        { "option": "color", "value": "Rouge" }
+      ],
+      "add": ["color_premium"]
+    },
+
+    {
+      "id": "size_l_rule",
+      "conditions": [
+        { "option": "size", "value": "L" }
+      ],
+      "add": ["size_l"]
+    },
+
+    {
+      "id": "gift_pack_rule",
+      "conditions": [
+        { "option": "gift_pack", "value": true }
+      ],
+      "add": ["gift_pack"]
+    },
+
+    {
+      "id": "engraving_rule",
+      "conditions": [
+        { "option": "engraving", "value": true }
+      ],
+      "add": ["engraving"]
+    },
+
+    {
+      "id": "warranty_rule",
+      "conditions": [
+        { "option": "warranty", "value": "1 an" }
+      ],
+      "add": ["warranty_1"]
+    },
+    {
+      "id": "warranty_rule_2",
+      "conditions": [
+        { "option": "warranty", "value": "2 ans" }
+      ],
+      "add": ["warranty_2"]
+    },
+
+    {
+      "id": "complex_example",
+      "conditions": [
+        { "option": "product_variant", "value": "Pro" },
+        { "option": "engraving", "value": true }
+      ],
+      "add": ["engraving", "gift_pack"]
+    }
+  ]
+}
