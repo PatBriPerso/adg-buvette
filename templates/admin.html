@@ -19,6 +19,26 @@
     </tbody>
   </table>
 
+  <form method="POST" action="/admin/clear" target="hidden_iframe" onsubmit="return confirmClear();">
+      <button type="submit" class="btn btn-danger mb-3">
+          🗑️ Vider toutes les commandes
+      </button>
+  </form>
+
+  <iframe name="hidden_iframe" style="display:none;"></iframe>
+
+  <script>
+  function confirmClear() {
+      if (confirm("⚠️ Êtes-vous sûr de vouloir supprimer TOUTES les commandes ?\n\nCette action est irréversible !\n\nUne sauvegarde CSV va être téléchargée avant suppression.")) {
+          setTimeout(() => {
+              location.reload(); // rafraîchit l'admin après le téléchargement
+          }, 1000); // petit délai pour laisser le CSV partir
+          return true;
+      }
+      return false;
+  }
+  </script>
+
   <h5 class="mt-3">Historique des commandes</h5>
   <table class="table">
     <thead><tr><th>#</th><th>Time (UTC)</th><th>Items</th><th>Total</th></tr></thead>

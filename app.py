@@ -119,15 +119,7 @@ def admin():
     total_general = sum(o["total"] for o in orders)
     return render_template("admin.html", orders=orders, totals=totals, total_general=total_general)
 
-@app.route("/admin/export")
-@requires_auth
-def admin_export():
-    db = get_db()
-    c = db.cursor()
-    c.execute("SELECT * FROM orders ORDER BY created_at ASC")
-    rows = c.fetchall()
-
-    # Réponse CSV
+def generate_csv_from_orders(rows):
     output = io.StringIO()
     output.write("order_id,created_at,product_id,product_name,product_price,product_qty,product_total\n")
 
@@ -141,8 +133,42 @@ def admin_export():
             total = price * qty
             output.write(f'{r["id"]},{r["created_at"]},{pid},"{name}",{price},{qty},{total}\n')
 
-    response = make_response(output.getvalue())
+    return output.getvalue()
+
+@app.route("/admin/export")
+@requires_auth
+def admin_export():
+    db = get_db()
+    c = db.cursor()
+    c.execute("SELECT * FROM orders ORDER BY created_at ASC")
+    rows = c.fetchall()
+
+    # Réponse CSV
+    csv_data = generate_csv_from_orders(rows)
+
+    response = make_response(csv_data)
     response.headers["Content-Disposition"] = "attachment; filename=buvette_orders.csv"
+    response.headers["Content-Type"] = "text/csv"
+    return response
+
+@app.route("/admin/clear", methods=["POST"])
+@requires_auth
+def admin_clear():
+    db = get_db()
+    c = db.cursor()
+    c.execute("SELECT * FROM orders ORDER BY created_at ASC")
+    rows = c.fetchall()
+
+    # Générer le CSV avant de supprimer
+    csv_data = generate_csv_from_orders(rows)
+
+    # Supprimer toutes les commandes
+    c.execute("DELETE FROM orders")
+    db.commit()
+
+    # Télécharger le CSV
+    response = make_response(csv_data)
+    response.headers["Content-Disposition"] = "attachment; filename=buvette_backup_before_clear.csv"
     response.headers["Content-Type"] = "text/csv"
     return response
 
