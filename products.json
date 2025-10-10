@@ -7,7 +7,7 @@
 
   {"id": "gaufre", "name": "Gaufre", "price": 2.00},
   {"id": "patisseries", "name": "Patisseries", "price": 1.50},
-  {"id": "clementines-3", "name": "Les 2 clémentines", "price": 1.00},
+  {"id": "clementines-3", "name": "Les 3 clémentines", "price": 1.00},
   {"id": "barre", "name": "Barres diverses (pièce)", "price": 0.50},
 
   {"id": "coca", "name": "Coca Cola", "price": 1.00},
@@ -18,5 +18,6 @@
   {"id": "the", "name": "Thé", "price": 0.50},
   {"id": "chocolat-chaud", "name": "Chocolat chaud", "price": 1.00},
 
-  {"id": "consigne-gobelet", "name": "Consigne du gobelet", "price": 1.00}
+  {"id": "consigne-gobelet", "name": "Consigne du gobelet", "price": 1.00},
+  {"id": "rendu-gobelet", "name": "Gobelet rendu", "price": -1.00}
 ]
