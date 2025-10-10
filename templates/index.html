@@ -22,13 +22,16 @@
       </div>
     </div>
     <ul id="cart" class="list-group mb-2"></ul>
-    <h4>A payer : <span id="total">0.00</span> €</h4>
-  </div>
+    <h4>À payer : <span id="total">0.00</span>€</h4>
+    <div>
+      <button id="send" class="btn btn-success btn-lg m-3">Commande payée</button>
+    </div>
 
-  <div>
-    <button id="send" class="btn btn-success btn-lg">Commande payée</button>
+    <h4>À rendre :</h4>
+    <ul id="change-list" class="list-group"></ul>
   </div>
 </div>
+<p>&nbsp;</p>
 <script>
   const PRODUCTS = {{ products| tojson }};
 </script>

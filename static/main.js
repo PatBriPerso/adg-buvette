@@ -1,4 +1,5 @@
 let cart = [];
+const cashOptions = [1, 2, 3, 4, 5, 10, 15, 20, 30, 40, 50];
 
 function renderCart(){
   const cartEl = document.getElementById("cart");
@@ -21,6 +22,33 @@ function renderCart(){
     });
   }
   document.getElementById("total").innerText = total.toFixed(2);
+
+  renderChange();
+}
+
+function renderChange() {
+    const changeList = document.getElementById("change-list");
+    changeList.innerHTML = "";
+
+    const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+    if (total === 0) {
+        changeList.innerHTML = '<li class="list-group-item text-muted">Panier vide.</li>';
+        return;
+    }
+
+    const filteredOptions = cashOptions.filter(amount => amount > total);
+    if (filteredOptions.length === 0) {
+        changeList.innerHTML = '<li class="list-group-item text-muted">Aucun rendu possible</li>';
+        return;
+    }
+
+    filteredOptions.forEach(amount => {
+        const change = (amount - total).toFixed(2);
+        const li = document.createElement("li");
+        li.className = "list-group-item d-flex justify-content-between";
+        li.innerHTML = `<span>Sur ${amount}€</span> <strong>${change}€</strong>`;
+        changeList.appendChild(li);
+    });
 }
 
 function inc(i){ cart[i].qty++; renderCart(); }
