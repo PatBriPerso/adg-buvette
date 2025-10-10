@@ -3,9 +3,9 @@ import json
 import sqlite3
 import csv
 from datetime import datetime
-from flask import Flask, g, render_template, request, Response
+from flask import Flask, g, render_template, request, Response, make_response
 from functools import wraps
-from io import StringIO
+import io
 
 # charge .env si présent (utile en dev)
 from dotenv import load_dotenv
@@ -121,22 +121,27 @@ def admin():
 def admin_export():
     db = get_db()
     c = db.cursor()
-    c.execute("SELECT * FROM orders ORDER BY created_at DESC")
+    c.execute("SELECT * FROM orders ORDER BY created_at ASC")
     rows = c.fetchall()
 
-    output = StringIO()
-    writer = csv.writer(output)  # utilisera l'échappement CSV correct
-    writer.writerow(["order_id", "created_at", "total", "items_json"])
+    # Réponse CSV
+    output = io.StringIO()
+    output.write("order_id,created_at,product_id,product_name,product_price,product_qty,product_total\n")
 
     for r in rows:
-        writer.writerow([r["id"], r["created_at"], r["total"], r["items_json"]])
+        items = json.loads(r["items_json"])
+        for it in items:
+            pid = it.get("id", "")
+            name = it.get("name", "").replace('"', '""')
+            price = float(it.get("price", 0))
+            qty = int(it.get("qty", 1))
+            total = price * qty
+            output.write(f'{r["id"]},{r["created_at"]},{pid},"{name}",{price},{qty},{total}\n')
 
-    output.seek(0)
-    return Response(
-        output.getvalue(),
-        mimetype="text/csv",
-        headers={"Content-Disposition": "attachment;filename=orders.csv"}
-    )
+    response = make_response(output.getvalue())
+    response.headers["Content-Disposition"] = "attachment; filename=buvette_orders.csv"
+    response.headers["Content-Type"] = "text/csv"
+    return response
 
 # initialise DB si besoin (utile pour la 1re exécution en container)
 def init_db():
