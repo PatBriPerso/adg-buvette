@@ -30,6 +30,7 @@ Tableau age FFTA, tableau tarifs AdG, renouvellement ou pas
 ## Version générique
 
 J'ai généré une version générique grâce à cette conversation ChatGPT :
+https://chatgpt.com/share/68e986fa-3358-800d-85e9-86ca7e369370
 
 Se mettre dans le dossier `forum` puis faire la commande :
 ```bash
