@@ -6,6 +6,8 @@ from datetime import datetime
 from flask import Flask, g, render_template, request, Response, make_response
 from functools import wraps
 import io
+import pytz
+from datetime import datetime
 
 # charge .env si présent (utile en dev)
 from dotenv import load_dotenv
@@ -16,6 +18,7 @@ DB = os.getenv("TILL_DB", "/data/till.db")
 ADMIN_USER = os.getenv("ADMIN_USER", "buvette")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "secret")
 FLASK_SECRET = os.getenv("FLASK_SECRET", "change_this_secret")
+LOCAL_TZ = pytz.timezone("Europe/Paris")
 
 app = Flask(__name__)
 app.secret_key = FLASK_SECRET
@@ -124,6 +127,15 @@ def generate_csv_from_orders(rows):
     output.write("order_id,created_at,product_id,product_name,product_price,product_qty,product_total\n")
 
     for r in rows:
+        # Convertir created_at UTC → local
+        try:
+            dt_utc = datetime.fromisoformat(r["created_at"])
+            dt_utc = pytz.UTC.localize(dt_utc)
+            dt_local = dt_utc.astimezone(LOCAL_TZ)
+            created_at_str = dt_local.strftime("%d/%m/%Y %H:%M:%S")
+        except Exception:
+            created_at_str = r["created_at"]  # fallback
+
         items = json.loads(r["items_json"])
         for it in items:
             pid = it.get("id", "")
@@ -131,7 +143,7 @@ def generate_csv_from_orders(rows):
             price = float(it.get("price", 0))
             qty = int(it.get("qty", 1))
             total = price * qty
-            output.write(f'{r["id"]},{r["created_at"]},{pid},"{name}",{price},{qty},{total}\n')
+            output.write(f'{r["id"]},{created_at_str},{pid},"{name}",{price},{qty},{total}\n')
 
     return output.getvalue()
 
