@@ -109,9 +109,12 @@ def admin():
     for o in orders:
         for it in o["items"]:
             pid = it["id"]
+            price = float(it.get("price", 0))
             qty = int(it.get("qty", 1))
-            totals.setdefault(pid, {"name": it.get("name"), "qty": 0})
+            it_total = price * qty
+            totals.setdefault(pid, {"name": it.get("name"), "qty": 0, "total": 0})
             totals[pid]["qty"] += qty
+            totals[pid]["total"] += it_total
     # total général
     total_general = sum(o["total"] for o in orders)
     return render_template("admin.html", orders=orders, totals=totals, total_general=total_general)
