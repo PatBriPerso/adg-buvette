@@ -97,7 +97,9 @@ def admin():
             qty = int(it.get("qty", 1))
             totals.setdefault(pid, {"name": it.get("name"), "qty": 0})
             totals[pid]["qty"] += qty
-    return render_template("admin.html", orders=orders, totals=totals)
+    # total général
+    total_general = sum(o["total"] for o in orders)
+    return render_template("admin.html", orders=orders, totals=totals, total_general=total_general)
 
 @app.route("/admin/export")
 @requires_auth
