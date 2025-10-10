@@ -18,6 +18,8 @@
       </div>
     </div>
 
+    <h5 class="mt-3">Total général ventes : {{ '%.2f' % total_general }} €</h5>
+
     <h5 class="mt-3">Totaux par produit</h5>
     <table class="table table-sm">
       <thead><tr><th>Produit</th><th>Quantité vendue</th><th>Montant total</th></tr></thead>
@@ -27,8 +29,6 @@
       {% endfor %}
       </tbody>
     </table>
-
-    <h5 class="mt-3">Total général ventes : {{ '%.2f' % total_general }} €</h5>
 
     <h5 class="mt-3">Historique des commandes</h5>
     <table class="table">
