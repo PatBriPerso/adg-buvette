@@ -4,24 +4,32 @@
   <div class="col-md-8">
     <div id="products" class="mb-3">
       {% for p in products %}
-        <button class="btn btn-primary btn-lg m-2 product-btn" data-id="{{p.id}}" data-name="{{p.name}}" data-price="{{p.price}}">
-          {{p.name}} — {{'%.2f' % p.price}}€
-        </button>
+      <button class="btn btn-primary btn-lg m-2 product-btn" data-id="{{p.id}}" data-name="{{p.name}}"
+        data-price="{{p.price}}">
+        {{p.name}} [{{'%.2f' % p.price}}€]
+      </button>
       {% endfor %}
-    </div>
-    <div>
-      <button id="clear" class="btn btn-secondary">Vider le panier</button>
-      <button id="send" class="btn btn-success">Valider la commande</button>
     </div>
   </div>
 
   <div class="col-md-4">
-    <h5>Panier</h5>
+    <div class="row">
+      <div class="col">
+        <h2>Panier</h2>
+      </div>
+      <div class="col text-end">
+        <button id="clear" class="btn btn-danger btn-sm">Vider le panier</button>
+      </div>
+    </div>
     <ul id="cart" class="list-group mb-2"></ul>
-    <h4>Total: <span id="total">0.00</span> €</h4>
+    <h4>A payer : <span id="total">0.00</span> €</h4>
+  </div>
+
+  <div>
+    <button id="send" class="btn btn-success">Commande payée</button>
   </div>
 </div>
 <script>
-const PRODUCTS = {{ products|tojson }};
+  const PRODUCTS = {{ products| tojson }};
 </script>
 {% endblock %}
