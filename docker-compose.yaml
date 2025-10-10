@@ -1,0 +1,18 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: towerify/Dockerfile
+    image: buvette/app:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      # si TILL_DB est défini dans .env, il sera utilisé, sinon on monte /data/till.db
+      - TILL_DB=/data/till.db
+      - FLASK_ENV=production
+    volumes:
+      - ./data:/data    # persiste till.db ici
+      - ./products.json:/app/products.json:ro
+    ports:
+      - "7828:7828"
