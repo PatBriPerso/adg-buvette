@@ -3,7 +3,7 @@ import json
 import sqlite3
 import csv
 from datetime import datetime
-from flask import Flask, g, render_template, request, Response, make_response
+from flask import Flask, g, render_template, request, Response, make_response, jsonify, session, redirect, url_for
 from functools import wraps
 import io
 import pytz
@@ -18,6 +18,8 @@ DB = os.getenv("TILL_DB", "/data/till.db")
 ADMIN_USER = os.getenv("ADMIN_USER", "buvette")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "secret")
 FLASK_SECRET = os.getenv("FLASK_SECRET", "change_this_secret")
+ACCESS_CODE = os.environ.get("ACCESS_CODE")
+
 LOCAL_TZ = pytz.timezone("Europe/Paris")
 
 app = Flask(__name__)
@@ -47,8 +49,35 @@ def load_products():
     with open("products.json", "r", encoding="utf-8") as f:
         return json.load(f)
 
-@app.route("/", methods=["GET"])
-def index():
+@app.route("/", methods=["GET", "POST"])
+def home():
+    if not ACCESS_CODE:  # si la variable n'est pas définie ou vide
+        session["access_granted"] = True  # autorise directement
+        return redirect(url_for("buvette"))
+
+    if session.get("access_granted"):
+        return redirect(url_for("buvette"))
+
+    return render_template("access.html")
+
+@app.route("/validate_code", methods=["POST"])
+def validate_code():
+    if not ACCESS_CODE:
+        session["access_granted"] = True
+        return jsonify({"status": "ok"})
+
+    data = request.get_json()
+    code = data.get("code")
+    if code == ACCESS_CODE:
+        session["access_granted"] = True
+        return jsonify({"status": "ok"})
+    else:
+        return jsonify({"status": "error"}), 401
+
+@app.route("/buvette")
+def buvette():
+    if not session.get("access_granted"):
+        return redirect(url_for("home"))
     products = load_products()
     return render_template("index.html", products=products)
 
