@@ -1,5 +1,5 @@
 let cart = [];
-const cashOptions = [1, 2, 3, 4, 5, 10, 15, 20, 30, 40, 50];
+const cashOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 40, 50];
 
 function renderCart(){
   const cartEl = document.getElementById("cart");
@@ -23,7 +23,21 @@ function renderCart(){
   }
   document.getElementById("total").innerText = total.toFixed(2);
 
-  renderChange();
+  if (total > 0) {
+    document.getElementById("a_payer").innerText = `À payer : ${total.toFixed(2)}€`;
+    document.getElementById("a_rendre").innerText = `À rendre :`;
+    renderChange();
+  } else if (total == 0) {
+    document.getElementById("a_payer").innerText = `À payer : 0€`;
+    document.getElementById("a_rendre").innerText = `À rendre : 0€`;
+    document.getElementById("change-list").innerText = ``;
+  } else { // total < 0
+    let aRendre = -total;
+    document.getElementById("a_payer").innerText = `À payer : 0€`;
+    document.getElementById("a_rendre").innerText = `À rendre : ${aRendre.toFixed(2)}€`;
+    document.getElementById("change-list").innerText = ``;
+  }
+
 }
 
 function renderChange() {
