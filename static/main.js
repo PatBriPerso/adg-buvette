@@ -83,22 +83,85 @@ document.getElementById("clear").addEventListener("click", () => {
   renderCart();
 });
 
-document.getElementById("send").addEventListener("click", async () => {
-  if(cart.length === 0){ alert("Panier vide."); return; }
-  const payload = { items: cart };
-  const resp = await fetch("/order", {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify(payload)
+function messageConfirmationCommande(type) {
+  let total = 0;
+  let message = "";
+
+  cart.forEach((it, idx) => {
+    message += `${it.qty}x ${it.name} = ${(it.price*it.qty).toFixed(2)}€\n`;
+    total += it.price * it.qty;
   });
-  const j = await resp.json();
-  if(resp.ok){
-    alert("Commande enregistrée — total: " + j.total.toFixed(2) + "€");
-    cart = [];
-    renderCart();
-  } else {
-    alert("Erreur: " + (j.error || JSON.stringify(j)));
+
+  message = "Commande "+type.toUpperCase()+` pour un total de ${total.toFixed(2)}€\n\n` + message;
+  message += "\n\n⚠️ Êtes-vous sûr de vouloir enregistrer cette commande ?";
+
+  return message;
+}
+
+function confirmerCommande(type = "standard") {
+  if (confirm(messageConfirmationCommande(type))) {
+    return true;
   }
+  return false;
+}
+
+async function enregistrerCommande(type) {
+  if (cart.length === 0) {
+    alert("Panier vide.");
+    return;
+  }
+
+  if (! confirmerCommande(type)) {
+    return;
+  }  
+
+  const boutons = document.querySelectorAll(".btn-commande");
+
+  // Désactiver tous les boutons
+  boutons.forEach(btn => {
+    btn.disabled = true;
+    btn.dataset.originalText = btn.textContent;
+    btn.textContent = "Envoi...";
+  });
+
+  const payload = { items: cart, type: type };
+
+  try {
+    const resp = await fetch("/order", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(payload)
+    });
+
+    const j = await resp.json();
+
+    if (resp.ok) {
+      cart = [];
+      renderCart();
+    } else {
+      alert("⚠️ Erreur: " + (j.error || JSON.stringify(j)));
+    }
+  } catch (err) {
+    alert("⚠️ Commande non enregistrée.\n\nVérifiez votre connexion et recommencez.\n\nMessage : " + err.message);
+  } finally {
+    // Réactiver tous les boutons quoi qu'il arrive
+    boutons.forEach(btn => {
+      btn.disabled = false;
+      btn.textContent = btn.dataset.originalText;
+    });
+  }
+}
+
+document.getElementById("send_standard").addEventListener("click", () => {
+  enregistrerCommande("standard");
+});
+
+document.getElementById("send_club").addEventListener("click", () => {
+  enregistrerCommande("club");
+});
+
+document.getElementById("send_organisateur").addEventListener("click", () => {
+  enregistrerCommande("organisateur");
 });
 
 renderCart();

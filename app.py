@@ -86,6 +86,7 @@ def order():
     data = request.get_json()
     if not data:
         return {"error": "No JSON payload"}, 400
+    
     items = data.get("items", [])
     if not items:
         return {"error": "Empty order"}, 400
@@ -93,15 +94,18 @@ def order():
         total = sum(float(it.get("price", 0)) * int(it.get("qty", 0)) for it in items)
     except Exception:
         return {"error": "Invalid items data"}, 400
+    
+    order_type = data.get("type", "standard")
     created_at = datetime.utcnow().isoformat()
+    
     db = get_db()
     c = db.cursor()
     c.execute(
-        "INSERT INTO orders (items_json, total, created_at) VALUES (?, ?, ?)",
-        (json.dumps(items, ensure_ascii=False), total, created_at)
+        "INSERT INTO orders (type, items_json, total, created_at) VALUES (?, ?, ?, ?)",
+        (order_type, json.dumps(items, ensure_ascii=False), total, created_at)
     )
     db.commit()
-    return {"status": "ok", "total": total}
+    return {"status": "ok", "total": total, "type": order_type}
 
 # --- Basic Auth ---
 def check_auth(username, password):
@@ -133,6 +137,7 @@ def admin():
     for r in rows:
         orders.append({
             "id": r["id"],
+            "type": r["type"],
             "items": json.loads(r["items_json"]),
             "total": r["total"],
             "created_at": r["created_at"]
@@ -153,7 +158,7 @@ def admin():
 
 def generate_csv_from_orders(rows):
     output = io.StringIO()
-    output.write("order_id,created_at,product_id,product_name,product_price,product_qty,product_total\n")
+    output.write("order_id,type,created_at,product_id,product_name,product_price,product_qty,product_total\n")
 
     for r in rows:
         # Convertir created_at UTC → local
@@ -172,7 +177,7 @@ def generate_csv_from_orders(rows):
             price = float(it.get("price", 0))
             qty = int(it.get("qty", 1))
             total = price * qty
-            output.write(f'{r["id"]},{created_at_str},{pid},"{name}",{price},{qty},{total}\n')
+            output.write(f'{r["id"]},{r["type"]},{created_at_str},{pid},"{name}",{price},{qty},{total}\n')
 
     return output.getvalue()
 
@@ -215,17 +220,27 @@ def admin_clear():
 
 # initialise DB si besoin (utile pour la 1re exécution en container)
 def init_db():
-    schema = """
-    CREATE TABLE IF NOT EXISTS orders (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        items_json TEXT NOT NULL,
-        total REAL NOT NULL,
-        created_at TEXT NOT NULL
-    );
-    """
     conn = sqlite3.connect(DB)
     c = conn.cursor()
-    c.executescript(schema)
+
+    # Création initiale de la table si elle n'existe pas
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS orders (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            items_json TEXT NOT NULL,
+            total REAL NOT NULL,
+            created_at TEXT NOT NULL
+        );
+    """)
+
+    # Vérifier si la colonne 'type' existe déjà
+    c.execute("PRAGMA table_info(orders);")
+    columns = [col[1] for col in c.fetchall()]
+
+    # si non, l'ajouter
+    if "type" not in columns:
+        c.execute("ALTER TABLE orders ADD COLUMN type TEXT NOT NULL DEFAULT 'standard';")
+
     conn.commit()
     conn.close()
 

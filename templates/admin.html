@@ -52,12 +52,13 @@
 
   <h5 class="mt-3">Historique des commandes</h5>
   <table class="table">
-    <thead><tr><th>#</th><th>Date et heure</th><th>Produits</th><th>Total</th></tr></thead>
+    <thead><tr><th>#</th><th>Date et heure</th><th>Type</th><th>Produits</th><th>Total</th></tr></thead>
     <tbody>
       {% for o in orders %}
       <tr>
         <td>{{o.id}}</td>
         <td><span class="utc-date">{{o.created_at}}</span></td>
+        <td>{{o.type}}</td>
         <td>
           <ul>
           {% for it in o["items"] %}
