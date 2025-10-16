@@ -218,6 +218,15 @@ def admin_clear():
     response.headers["Content-Type"] = "text/csv"
     return response
 
+@app.route("/last_orders")
+def last_orders():
+    db = get_db()
+    c = db.cursor()
+    c.execute("SELECT id, type, total FROM orders ORDER BY id DESC LIMIT 5")
+    rows = c.fetchall()
+    orders = [{"id": r["id"], "type": r["type"], "total": r["total"]} for r in rows]
+    return jsonify(orders)
+
 # initialise DB si besoin (utile pour la 1re exécution en container)
 def init_db():
     conn = sqlite3.connect(DB)

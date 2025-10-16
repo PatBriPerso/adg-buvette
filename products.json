@@ -18,6 +18,6 @@
   {"id": "the", "name": "Thé", "price": 0.50},
   {"id": "chocolat-chaud", "name": "Chocolat chaud", "price": 1.00},
 
-  {"id": "consigne-gobelet", "name": "Consigne du gobelet", "price": 1.00},
+  {"id": "consigne-gobelet", "name": "Gobelet consigné", "price": 1.00},
   {"id": "rendu-gobelet", "name": "Gobelet rendu", "price": -1.00}
 ]

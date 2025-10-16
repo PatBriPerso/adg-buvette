@@ -18,7 +18,7 @@
 - [x] Gérer les commandes particulières
     - [x] les volontaires organisateur du club ne paient pas
     - [x] certains archers ne paient pas directement car c'est leur club qui payent
-
+- [x] Afficher la liste des N dernières commandes (numéro, type, total) en bas de la page
 
 V2 : laisser les archers faire leur commande
 

@@ -138,6 +138,7 @@ async function enregistrerCommande(type) {
     if (resp.ok) {
       cart = [];
       renderCart();
+      await loadLastOrders();
     } else {
       alert("⚠️ Erreur: " + (j.error || JSON.stringify(j)));
     }
@@ -164,4 +165,31 @@ document.getElementById("send_organisateur").addEventListener("click", () => {
   enregistrerCommande("organisateur");
 });
 
+async function loadLastOrders() {
+  try {
+    const resp = await fetch("/last_orders");
+    const orders = await resp.json();
+    const list = document.getElementById("last-orders");
+    list.innerHTML = "";
+
+    if (!orders.length) {
+      list.innerHTML = `<li class="list-group-item text-muted">Aucune commande pour le moment.</li>`;
+      return;
+    }
+
+    orders.forEach(o => {
+      const li = document.createElement("li");
+      li.className = "list-group-item d-flex justify-content-between";
+      li.innerHTML = `<span>#${o.id} (${o.type})</span> <strong>${o.total.toFixed(2)}€</strong>`;
+      list.appendChild(li);
+    });
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+// Bouton rafraîchir
+document.getElementById("refresh-orders").addEventListener("click", loadLastOrders);
+
+loadLastOrders();
 renderCart();
