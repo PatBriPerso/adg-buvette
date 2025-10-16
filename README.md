@@ -15,3 +15,24 @@ L'application a été conçue pour être utilisée sur un téléphone
 portable donc il peut y avoir plusieurs personnes qui servent
 à la buvette. Chacune peut afficher l'application sur son
 téléphone et servir des personnes en parallèle.
+
+## Développement en local
+
+Installer les dépendances :
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+python3 -m pip install --upgrade pip
+python3 -m pip install -r requirements.txt
+deactivate
+```
+
+Lancer le serveur :
+
+```bash
+source venv/bin/activate
+python3 app.py
+deactivate
+```
+
